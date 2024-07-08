@@ -1,12 +1,22 @@
-POST http://localhost:3333/api/persons
-Content-Type: application/application/json
+### 
 
-{
-    "name": "John Doe",
-    "number": "123321123",
-    "id": 69
-}
+GET http://localhost:3001/api/persons
 
 ###
 
-GET http://localhost:3333/api/persons
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Koala",
+    "number": "999000111"
+}
+
+###
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "JaneDoe",
+    "number": "321"
+}
