@@ -16,8 +16,22 @@ mongoose.connect(url)
 
 // initialize document schema
 const contactSchema = new mongoose.Schema({
-    name: String,
-    number: String,
+    name: {
+        type: String,
+        minLength: 3,
+        required: true,
+    },
+    number: {
+        type: String,
+        minLength: 8,
+        required: true,
+        validate: {
+            validator: function(num) {
+                return /^\d{2,3}-\d+$/.test(num)
+            },
+            message: props => `${props.value} is not a valid phone number`
+        }
+    }
 });
 
 // configure schema to not show _id and __v during fetch

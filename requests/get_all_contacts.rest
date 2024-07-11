@@ -13,10 +13,22 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3001/api/persons
+PUT `
 Content-Type: application/json
 
 {
     "name": "JaneDoe",
-    "number": "321"
+    "number": "3342"
+}
+
+###
+DELETE http://localhost:3001/api/persons/668fe3cb1f4028d93f6c9996
+
+###
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Mooose",
+    "number": "123-0123-902"
 }

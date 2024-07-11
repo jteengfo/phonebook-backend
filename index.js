@@ -43,24 +43,35 @@ app.use(cors())
 // }    
 
 // routes
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
     // response.json(contacts)`
     Contact
       .find({})
       .then(contacts => {
         response.json(contacts)
       })
+      .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
+
+  Contact.findById(request.params.id)
+    .then(result => {
+      response.json(result)
+      console.log('Found ID: ', result)
+    })
+    .catch(error => next(error))
+})
+
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
     console.log(request.body)
 
-    if (!body.number || !body.name) {
-        response.status(404).json({
-            error: "number or name missing"
-        }).end()
-    }
+    // if (!body.number || !body.name) {
+    //     response.status(404).json({
+    //         error: "number or name missing"
+    //     }).end()
+    // }
 
     // const contact = {
     //     "name": body.name,
@@ -81,8 +92,55 @@ app.post('/api/persons', (request, response) => {
       .then(savedContact => {
         response.json(savedContact)
       })
+      .catch(error => next(error))
 })
 
+app.put('/api/persons/:id', (request, response, next) => {
+
+  const body = request.body
+
+  // create js object - not from constructor because
+  // were updating an existing one already is my assumption
+
+  const contact = {
+    name: body.name,
+    number: body.number
+  }
+
+  Contact.findByIdAndUpdate(request.params.id, 
+    {name, number}, 
+    {new : true, runValidators: true, context: 'query'})
+    .then(updatedContact => {
+      console.log("Updated contact: ", updatedContact)
+      response.json(updatedContact)
+    })
+    .catch(error => next(error))
+})
+
+app.delete('/api/persons/:id', (request, response, next) => {
+  Contact.findByIdAndDelete(request.params.id)
+    .then(result => {
+      console.log('deletion result: ', result )
+      return response.status(200).end()
+    })
+    .catch(error => next(error))
+})
+
+const errorHandler = (error, request, response, next) => {
+  console.log(error)
+
+  if (error.name === "CastError") {
+    return response.status(404).send({error: "malformatted id"})
+  } else if (error.name === "SyntaxError") {
+    return response.status(404).send({error: "missing number or name"})
+  } else if (error.name === "ValidationError") {
+    return response.status(400).json({error: error.message})
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
 const PORT = process.env.PORT || 3
 app.listen(PORT, () => {
     console.log(`listening to port ${PORT}`)
